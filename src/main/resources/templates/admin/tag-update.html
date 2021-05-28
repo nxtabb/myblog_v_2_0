@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <!--设置移动端-->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>修改标签</title>
+    <!--引入css-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <link rel="stylesheet" th:href="@{/lib/editormd/css/editormd.min.css}">
+    <link rel="stylesheet" th:href="@{/css/me.css}">
+
+</head>
+
+<body>
+<!--导航栏容器-->
+<div th:include="admin-header"></div>
+<!--标题-->
+<div class="ui attached pointing menu">
+    <div class="ui container">
+        <div class="right menu">
+            <a th:href="@{/admin/tags/input}" class="item active">新增标签</a>
+            <a th:href="@{/admin/tags/1}" class="teal item ">列表</a>
+        </div>
+    </div>
+
+</div>
+<!--文档内容-->
+<div class="m-padded-tb-large m-container-small">
+    <div class="ui container">
+        <form class="ui form" th:action="@{/admin/tags/updateTag/{tagId}(tagId=${tagId})}" method="post">
+            <div class="field">
+                <div class="ui left labeled input">
+                    <label class="ui teal basic label">名称</label>
+                    <input type="text" name="name" id="tag_input" th:value="${tag.tagName}" placeholder="分类名称">
+                </div>
+                <span id="err_tag"></span>
+            </div>
+            <!--checkbox的容器-->
+
+            <div class="ui error message"></div>
+            <!--三个按钮-->
+            <div class="ui right aligned container">
+                <button class="ui button" type="button" onclick="window.history.go(-1)">返回</button>
+                <button class="ui teal button">提交</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!--底部容器-->
+<div th:include="admin-footer"></div>
+<!--引入jquery-->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+<!--引入semantic的js库-->
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+<script th:src="@{/lib/editormd/editormd.min.js}"></script>
+<script>
+    var tag_flag = false;
+    $(".menu.toggle").click(function (){
+        $(".m-item").toggleClass('m-mobile-hide');
+    });
+    $('.ui.dropdown').dropdown({
+        on:'hover'
+    });
+    $('.ui.form').form({
+        fields:{
+            title:{
+                identifier: 'name',
+                rules:[{
+                    type:'empty',
+                    prompt:'请输入分类内容'
+                }]
+            }
+        }
+    })
+    $("#tag_input").blur(function () {
+        var tag = $("#tag_input").val();
+        $.ajax({
+            url:'/admin/tags/checktag/'+tag,
+            type:'GET',
+            datatype:'JSON',
+            success:function(data) {
+                if(data.success){
+                    tag_flag = true;
+                }else {
+                    alert("此标签已存在");
+                    tag_flag = false;
+                }
+            }
+
+        })
+
+    });
+    $("#index-btn").click(function () {
+        window.location.href='/admin/index';
+
+    })
+
+</script>
+</body>
+</html>

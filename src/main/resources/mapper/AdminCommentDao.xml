@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrbeu.dao.admin.AdminCommentDao">
+    <update id="setParentCommentToNull" parameterType="long">
+        update tb_comment set parent_id = null where document_id=#{documentId}
+    </update>
+
+    <delete id="deleteCommentByDocumentId" parameterType="long">
+        delete from tb_comment where document_id=#{documentId}
+    </delete>
+    <!-- SQL语句 -->
+</mapper>

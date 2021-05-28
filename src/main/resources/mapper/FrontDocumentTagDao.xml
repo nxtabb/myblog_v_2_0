@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrbeu.dao.front.FrontDocumentTagDao">
+    <!-- SQL语句 -->
+    <select id="queryTagCountInPublishedDocument" parameterType="long" resultType="int">
+        select count(dt.document_id)
+        from tb_document_tag dt
+        INNER JOIN tb_document doc
+        on dt.document_id = doc.document_id
+        and doc.published = 1
+        GROUP BY tag_id
+        having tag_id = #{tagId}
+    </select>
+</mapper>

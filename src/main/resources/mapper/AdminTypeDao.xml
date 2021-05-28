@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrbeu.dao.admin.AdminTypeDao">
+    <select id="queryAllTypes" resultType="com.hrbeu.pojo.Type">
+        select * from tb_type
+    </select>
+    <select id="queryTypeById" resultType="com.hrbeu.pojo.Type" parameterType="long">
+        select * from tb_type where type_id=#{typeId}
+    </select>
+
+    <select id="queryAllTypeCount" resultType="int">
+        select count(*) from tb_type
+    </select>
+
+    <select id="queryTypeListByPage" resultType="com.hrbeu.pojo.Type">
+        select * from tb_type limit #{begin},#{pageSize}
+    </select>
+
+    <update id="updateTypeName">
+        update tb_type set type_name = #{typeName} where type_id = #{typeId}
+    </update>
+
+    <delete id="deleteTypeById" parameterType="long">
+        delete from tb_type where type_id=#{typeId}
+    </delete>
+    <!-- SQL语句 -->
+    <insert id="addType" parameterType="string">
+        insert into tb_type (type_name) values (#{typeName})
+    </insert>
+
+</mapper>

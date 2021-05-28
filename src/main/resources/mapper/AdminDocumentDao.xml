@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrbeu.dao.admin.AdminDocumentDao">
+
+    <resultMap id="documentWithAllInfo" type="com.hrbeu.pojo.Document">
+        <id property="documentId" column="document_id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="firstPicture" column="first_picture"/>
+        <result property="flag" column="flag"/>
+        <result property="appreciate" column="appreciate"/>
+        <result property="commentAble" column="comment_able"/>
+        <result property="shareInfo" column="share_info"/>
+        <result property="recommend" column="recommend"/>
+        <result property="createTime" column="create_time"/>
+        <result property="published" column="published"/>
+        <result property="lastEditTime" column="last_edit_time"/>
+        <result property="description" column="description"/>
+        <association property="type" javaType="com.hrbeu.pojo.Type">
+            <id property="typeId" column="type_id"/>
+            <result property="typeName" column="type_name"/>
+        </association>
+        <association property="user" javaType="com.hrbeu.pojo.User">
+            <id column="user_id" property="userId"/>
+            <result column="nickname" property="nickname"/>
+            <result column="username" property="username"/>
+            <result column="email" property="email"/>
+            <result column="image" property="image"/>
+            <result column="authority" property="authority"/>
+            <result property="createTime" column="create_time"/>
+            <result property="createTime" column="create_time"/>
+        </association>
+        <collection property="tagList" ofType="com.hrbeu.pojo.Tag" column="document_id">
+            <id property="tagId" column="tag_id" javaType="long"/>
+            <id property="tagName" column="tag_name" javaType="java.lang.String"/>
+        </collection>
+    </resultMap>
+
+
+
+    <select id="queryAllDocumentByPage" resultMap="documentWithAllInfo">
+        select * from tb_document doc,tb_user user,tb_type type where doc.type_id = type.type_id
+        and doc.user_id = user.user_id  order by doc.last_edit_time desc limit #{begin},#{pageSize}
+    </select>
+
+    <select id="queryAllDocumentCount" resultType="int">
+        select count(*) from tb_document
+    </select>
+
+    <select id="queryDocumentById" resultMap="documentWithAllInfo" parameterType="long">
+        select * from tb_document doc,tb_user user where doc.user_id = user.user_id and doc.document_id=#{documentId} and doc.published = 1
+    </select>
+
+    <delete id="deleteDocumentById" parameterType="long">
+        delete from tb_document where document_id = #{documentId}
+    </delete>
+
+    <insert id="addDocument" useGeneratedKeys="true" parameterType="com.hrbeu.pojo.Document" keyProperty="documentId">
+        insert into tb_document
+        (title,content,first_picture,flag,appreciate,comment_able,share_info,recommend,create_time,last_edit_time,published,user_id,type_id,description)
+        values
+        (
+        #{document.title},
+        #{document.content},
+        #{document.firstPicture},
+        #{document.flag},
+        #{document.appreciate},
+        #{document.commentAble},
+        #{document.shareInfo},
+        #{document.recommend},
+        #{document.createTime},
+        #{document.lastEditTime},
+        #{document.published},
+        #{document.user.userId},
+        #{document.type.typeId},
+        #{document.description}
+        )
+    </insert>
+
+
+    <select id="queryDocumentAndUserAndTagsById" parameterType="long" resultMap="documentWithAllInfo">
+        select * from
+        tb_document doc ,
+        tb_document_tag doctag ,
+        tb_user user ,
+        tb_type type ,
+        tb_tag tag
+        where
+        doc.document_id = doctag.document_id
+        and
+        doc.user_id = user.user_id
+        and
+        doc.type_id = type.type_id
+        and
+        tag.tag_id = doctag.tag_id
+        and
+        doc.document_id = #{documentId}
+    </select>
+    <update id="updateDocument" parameterType="com.hrbeu.pojo.Document">
+        update tb_document
+        set
+        <if test="#{document.title}!=null">
+            title =#{document.title},
+        </if>
+        <if test="#{document.content}!=null">
+            content =#{document.content},
+        </if>
+        <if test="#{document.firstPicture}!=null">
+            first_picture=#{document.firstPicture},
+        </if>
+        <if test="#{document.flag}!=null">
+            flag = #{document.flag},
+        </if>
+        <if test="#{document.appreciate}!=null">
+            appreciate=#{document.appreciate},
+        </if>
+        <if test="#{document.commentAble}!=null">
+            comment_able=#{document.commentAble},
+        </if>
+        <if test="#{document.shareInfo}!=null">
+            share_info = #{document.shareInfo},
+        </if>
+        <if test="#{document.published}!=null">
+            published = #{document.published},
+        </if>
+        <if test="#{document.recommend}!=null">
+            recommend = #{document.recommend},
+        </if>
+        <if test="#{document.lastEditTime}!=null">
+            last_edit_time = #{document.lastEditTime},
+        </if>
+        <if test="#{document.type}!=null and #{document.type.typeId}!=null">
+            type_id = #{document.type.typeId},
+        </if>
+        <if test="#{document.user}!=null and #{document.user.userId}!=null">
+            user_id = #{document.user.userId},
+        </if>
+        <if test="#{document.description}!=null">
+            description= #{document.description}
+        </if>
+        where document_id = #{document.documentId}
+    </update>
+
+    <select id="queryTypeCountInDocuments" parameterType="long" resultType="int">
+        select count(*) from tb_document group by type_id having type_id=#{typeId}
+    </select>
+
+</mapper>

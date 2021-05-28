@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrbeu.dao.front.FrontDocumentDao">
+    <resultMap id="document_published" type="com.hrbeu.pojo.Document">
+        <id column="document_id" property="documentId"/>
+        <result column="title" property="title"/>
+        <result column="description" property="description"/>
+        <result column="last_edit_time" property="lastEditTime"/>
+        <result column="first_picture" property="firstPicture"/>
+        <association property="type" javaType="com.hrbeu.pojo.Type">
+            <id column="type_id" property="typeId"/>
+            <result column="type_name" property="typeName"/>
+        </association>
+        <association property="user" javaType="com.hrbeu.pojo.User">
+            <id column="user_id" property="userId"/>
+            <result column="image" property="image"/>
+            <result column="nickname" property="nickname"/>
+        </association>
+    </resultMap>
+    <resultMap id="documentWithAllInfo" type="com.hrbeu.pojo.Document">
+        <id property="documentId" column="document_id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="firstPicture" column="first_picture"/>
+        <result property="flag" column="flag"/>
+        <result property="appreciate" column="appreciate"/>
+        <result property="commentAble" column="comment_able"/>
+        <result property="shareInfo" column="share_info"/>
+        <result property="recommend" column="recommend"/>
+        <result property="createTime" column="create_time"/>
+        <result property="published" column="published"/>
+        <result property="lastEditTime" column="last_edit_time"/>
+        <result property="description" column="description"/>
+        <association property="type" javaType="com.hrbeu.pojo.Type">
+            <id property="typeId" column="type_id"/>
+            <result property="typeName" column="type_name"/>
+        </association>
+        <association property="user" javaType="com.hrbeu.pojo.User">
+            <id column="user_id" property="userId"/>
+            <result column="nickname" property="nickname"/>
+            <result column="username" property="username"/>
+            <result column="email" property="email"/>
+            <result column="image" property="image"/>
+            <result column="authority" property="authority"/>
+            <result property="createTime" column="create_time"/>
+            <result property="createTime" column="create_time"/>
+        </association>
+        <collection property="tagList" ofType="com.hrbeu.pojo.Tag" column="document_id">
+            <id property="tagId" column="tag_id" javaType="long"/>
+            <id property="tagName" column="tag_name" javaType="java.lang.String"/>
+        </collection>
+    </resultMap>
+    <select id="queryPublishedDocumentList" resultMap="document_published">
+        select
+        tb_document.document_id,
+        tb_document.title,
+        tb_document.description,
+        tb_document.last_edit_time,
+        tb_document.first_picture,
+        tb_type.type_id,
+        tb_type.type_name,
+        tb_user.user_id,
+        tb_user.image,
+        tb_user.nickname
+        from
+        tb_document,
+        tb_user,
+        tb_type
+        where
+        tb_document.user_id=tb_user.user_id
+        and
+        tb_type.type_id = tb_document.type_id
+        and
+        tb_document.published=1
+        order by
+        tb_document.last_edit_time desc
+        limit
+        #{begin},#{pageSize}
+    </select>
+
+    <select id="queryPublishedDocumentCount" resultType="int">
+        select count(*) from tb_document where published = 1
+    </select>
+
+    <select id="queryRecommendDocumentList" parameterType="int" resultType="com.hrbeu.pojo.Document">
+        select document_id,title from tb_document where recommend=1 and published=1  order by last_edit_time desc limit #{count}
+    </select>
+
+    <select id="queryDocumentById" parameterType="long" resultMap="documentWithAllInfo">
+        select * from
+        tb_document doc,
+        tb_user user,
+        tb_type type,
+        tb_document_tag tag,
+        tb_tag tbtag
+        where
+        doc.type_id = type.type_id and
+        doc.document_id = tag.document_id and
+        doc.user_id = user.user_id and
+        tag.tag_id = tbtag.tag_id and
+        doc.document_id = #{documentId }
+    </select>
+
+    <select id="queryDocumentPageByTypeId" resultMap="document_published">
+        select
+        DISTINCT(doc.document_id),
+        doc.title,
+        doc.description,
+        doc.user_id,
+        doc.last_edit_time,
+        user.image,
+        doc.first_picture,
+        doc.type_id,
+        type.type_name,
+        user.nickname
+        from
+        tb_document doc,
+        tb_user user,
+        tb_type type
+        where
+        doc.type_id = #{typeId}
+        and
+        doc.type_id = type.type_id
+        and
+        doc.user_id = user.user_id
+        order by doc.last_edit_time desc
+        LIMIT #{begin},#{pageSize}
+    </select>
+    <select id="queryDocumentPageByTagId" resultMap="documentWithAllInfo">
+        select * from
+        tb_document doc,
+        tb_user user,
+        tb_type type,
+        tb_document_tag tag,
+        tb_tag tbtag
+        <where>
+        and doc.type_id = type.type_id
+        and doc.document_id = tag.document_id
+        and doc.user_id = user.user_id
+        and tag.tag_id = tbtag.tag_id
+        and doc.published=1
+        and tag.tag_id = #{tagId}
+        </where>
+        order by doc.last_edit_time desc
+        LIMIT #{begin},#{pageSize}
+    </select>
+
+    <select id="queryPublishedDocumentCountByTypeId" parameterType="long" resultType="int">
+        select count(*) from tb_document where type_id = #{typeId}
+    </select>
+
+    <select id="queryDocumentByYearAndMonthAndPage" resultType="string">
+        select DATE_FORMAT(doc.last_edit_time,'%Y-%M') as year from tb_document doc where doc.published=1 GROUP BY year  order by STR_TO_DATE(year,'%Y-%M') desc limit #{begin},#{pageSize};
+    </select>
+    <select id="queryDocumentByYearAndMonth" resultType="string">
+        select DATE_FORMAT(doc.last_edit_time,'%Y-%M') as year from tb_document doc where doc.published=1 GROUP BY year
+    </select>
+
+    <select id="queryPublishedDocumentByTime" parameterType="string" resultMap="documentWithAllInfo">
+        select * from
+        tb_document doc,
+        tb_user user,
+        tb_type type,
+        tb_document_tag tag,
+        tb_tag tbtag
+        where
+        doc.type_id = type.type_id and
+        doc.published = 1 and
+        doc.document_id = tag.document_id and
+        doc.user_id = user.user_id and
+        tag.tag_id = tbtag.tag_id and
+        DATE_FORMAT(doc.last_edit_time,'%Y-%M') = #{time}
+        order by doc.last_edit_time desc
+    </select>
+
+    <select id="queryDocumentByUserId" resultMap="documentWithAllInfo">
+        select * from
+        tb_document doc,
+        tb_user user,
+        tb_type type,
+        tb_document_tag tag,
+        tb_tag tbtag
+        where
+        doc.type_id = type.type_id and
+        doc.document_id = tag.document_id and
+        doc.user_id = user.user_id and
+        tag.tag_id = tbtag.tag_id and
+        doc.user_id = #{userId}
+        limit #{begin},#{pageSize}
+    </select>
+
+    <select id="queryDocumentCountByUserId" parameterType="long" resultType="int">
+        select count(*) from tb_document where user_id = #{userId}
+    </select>
+</mapper>

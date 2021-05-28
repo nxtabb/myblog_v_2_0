@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrbeu.dao.admin.AdminTagDao">
+    <select id="queryAllTags" resultType="com.hrbeu.pojo.Tag">
+        select * from tb_tag
+    </select>
+    <select id="queryTagsByIds" resultType="com.hrbeu.pojo.Tag">
+        select * from tb_tag
+        <where>
+            <if test="tagIds!=null and tagIds.size()>0">
+                tag_id in
+                <foreach collection="tagIds" item="tagId" open="(" close=")" separator=",">
+                    #{tagId}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="queryAllTagCount" resultType="int">
+        select count(*) from tb_tag
+    </select>
+
+    <delete id="deleteTagById" parameterType="long">
+        delete from tb_tag where tag_id = #{tagId}
+    </delete>
+    <!-- SQL语句 -->
+    <select id="queryTagById" parameterType="long" resultType="com.hrbeu.pojo.Tag">
+        select * from tb_tag where tag_id = #{tagId}
+    </select>
+
+    <update id="updateTagName">
+        update tb_tag set tag_name = #{tagName} where tag_id = #{tagId}
+    </update>
+
+    <insert id="addTag" parameterType="string">
+        insert into tb_tag (tag_name) values (#{tagName})
+    </insert>
+</mapper>

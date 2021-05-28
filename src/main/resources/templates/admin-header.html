@@ -1,0 +1,33 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<!--导航栏容器-->
+<nav class="ui inverted attached segment m-padded-tb-mini m-shadow-small" style="background:#B35E4D;color: rgba(255,255,255,0.8)"  th:fragment="admin-header" >
+    <!--为了让logo更加靠右，因此将其放入container中-->
+    <div class="ui container">
+        <!--创建一个menu-->
+        <div class="ui inverted secondary stackable menu">
+            <!--创建一个logo-->
+            <a href="#"><h2 class="ui teal header item" id="index-btn">宁熙桐的博客——后台管理</h2></a>
+            <!--菜单栏-->
+            <a th:href="@{/admin/documentsIndex/1}" class="m-item item m-mobile-hide"><i class="home icon"></i>全部文档</a>
+            <a th:href="@{/admin/types/1}" class="m-item item m-mobile-hide"><i class="idea icon"></i>管理分类</a>
+            <a th:href="@{/admin/tags/1}" class="m-item item m-mobile-hide"><i class="tags icon"></i>管理标签</a>
+            <div class="right m-item m-mobile-hide menu">
+                <div class="ui dropdown item">
+                    <div class="text">
+                        <img th:src="${session.user.image}" th:text="${session.user.nickname}" >
+                    </div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a th:href="@{/admin/logout}" class="item">注销</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="#" class="ui menu toggle black icon button m-right-top m-mobile-show">
+        <i class="sidebar icon"></i>
+    </a>
+
+</nav>
+</html>
+

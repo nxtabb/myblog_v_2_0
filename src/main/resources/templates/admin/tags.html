@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <!--设置移动端-->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>标签管理</title>
+    <!--引入css-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <link rel="stylesheet" th:href="@{/css/me.css}">
+</head>
+
+<body>
+<div th:include="admin-header"></div>
+<div class="ui attached pointing menu">
+    <div class="ui container">
+        <div class="right menu">
+            <a th:href="@{/admin/tags/input}" class="item">新增标签</a>
+            <a th:href="@{/admin/tags/1}" class="teal item active">列表</a>
+        </div>
+    </div>
+</div>
+<!--中间内容容器-->
+<div class="m-padded-tb-large m-container-small">
+    <div class="ui container">
+        <!--显示信息的表格-->
+        <div class="ui success message">
+            <i class="close icon"></i>
+            <div class="header">现在可以对标签进行操作。</div>
+            <p>注意：标签具有外键约束，请不要随意删除标签信息。修改和添加可以任意操作。</p>
+        </div>
+        <table class="ui celled table">
+            <thead>
+            <tr>
+                <th>序号</th>
+                <th>标签名称</th>
+                <th>关联文档数</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="tag,content:${tagList}">
+                <td th:text="${content.index+1}"></td>
+                <td th:text="${tag.tagName}"></td>
+                <td th:text="${tag.getCount()}"></td>
+                <td class="center-pill">
+                    <a th:href="@{/admin/tags/updateTag/{tagId}(tagId=${tag.tagId})}" class="ui mini teal button">编辑</a>
+                    <a th:if="${tag.getCount().equals(0)}" th:href="@{/admin/tags/deleteById/{tagId}(tagId=${tag.tagId})}" class="ui mini red button">删除</a>
+                </td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <th colspan="6">
+                    <div class="ui mini floated pagination menu">
+                        <a class="icon item" id="prePage">上一页</a>
+                        <a class="icon item" id="nextPage">下一页</a>
+                    </div>
+
+                    <a th:href="@{/admin/tags/input}" class="ui mini right floated basic button">新增</a>
+                </th>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<h1 th:text="${errMsg}" style="color: red" align="center"></h1>
+<!--底部容器-->
+<div th:include="admin-footer"></div>
+<!--引入jquery-->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+<!--引入semantic的js库-->
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+<script>
+    $(".menu.toggle").click(function (){
+        $(".m-item").toggleClass('m-mobile-hide');
+    });
+    $('.ui.dropdown').dropdown({
+        on:'hover'
+    });
+    $("#nextPage").click(function () {
+        window.location.href="/admin/tags/"+[[${nextPage}]];
+    })
+    $("#prePage").click(function () {
+        window.location.href="/admin/tags/"+[[${prePage}]];
+    })
+    $(".message.close").on('click',function () {
+        $(this).closest('.message').transition('fade');
+    });
+    $("#index-btn").click(function () {
+        window.location.href='/admin/index';
+    })
+</script>
+</body>
+</html>
