@@ -70,7 +70,7 @@
                     <td th:text="${#dates.format(file.file.lastEditTime,'yyyy-MM-dd HH:mm:ss')}"></td>
                     <td>
                         <a th:if="${session.user!=null}" th:href="@{/files/downloadFile/{documentId}/{fileId}(documentId=${document.documentId},fileId=${file.file.fileId})}" class="ui mini teal button">下载</a>
-                        <a th:if="${session.user.userId==document.user.userId}" th:href="@{/files/deletefile/{documentId}/{fileId}(documentId=${document.documentId},fileId=${file.file.fileId})}" class="ui mini red button">删除</a>
+                        <a th:if="${session.user!=null and session.user.userId.equals(document.user.userId)}" th:href="@{/files/deletefile/{documentId}/{fileId}(documentId=${document.documentId},fileId=${file.file.fileId})}" class="ui mini red button">删除</a>
                     </td>
                 </tr>
             </tbody>

@@ -23,7 +23,7 @@ import java.net.URLEncoder;
  * @Created by nxt
  */
 @Controller
-public class FrontFileController {
+public class  FrontFileController {
     @Autowired
     private FrontFileService frontFileService;
     @Autowired

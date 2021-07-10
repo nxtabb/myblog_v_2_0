@@ -174,20 +174,13 @@
         DATE_FORMAT(doc.last_edit_time,'%Y-%M') = #{time}
         order by doc.last_edit_time desc
     </select>
-
     <select id="queryDocumentByUserId" resultMap="documentWithAllInfo">
-        select * from
-        tb_document doc,
-        tb_user user,
-        tb_type type,
-        tb_document_tag tag,
-        tb_tag tbtag
+        select * from tb_document doc,tb_user user,tb_type type
         where
+        doc.user_id= #{userId} and
         doc.type_id = type.type_id and
-        doc.document_id = tag.document_id and
-        doc.user_id = user.user_id and
-        tag.tag_id = tbtag.tag_id and
-        doc.user_id = #{userId}
+        doc.user_id = user.user_id
+        order by doc.last_edit_time desc
         limit #{begin},#{pageSize}
     </select>
 
