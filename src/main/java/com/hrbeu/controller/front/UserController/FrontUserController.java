@@ -1,8 +1,19 @@
 package com.hrbeu.controller.front.UserController;
 
+import com.aliyuncs.CommonRequest;
+import com.aliyuncs.CommonResponse;
+import com.aliyuncs.DefaultAcsClient;
+import com.aliyuncs.IAcsClient;
+import com.aliyuncs.exceptions.ClientException;
+import com.aliyuncs.exceptions.ServerException;
+import com.aliyuncs.http.MethodType;
+import com.aliyuncs.profile.DefaultProfile;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrbeu.pojo.User;
 import com.hrbeu.service.front.FrontUserService;
 import com.hrbeu.utils.MD5Util;
+import com.hrbeu.utils.RedisUtil;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,6 +30,8 @@ import java.util.Map;
 public class FrontUserController {
     @Autowired
     private FrontUserService frontUserService;
+    @Autowired
+    private RedisUtil redisUtil;
     //注册
     @PostMapping("/register")
     public String register(@Param("username")String username, @Param("password")String password, @Param("email")String email, @Param("nickname")String nickname, Model model, HttpServletRequest request){
@@ -85,6 +98,26 @@ public class FrontUserController {
         return "redirect:/front/login";
     }
 
+    @PostMapping("/verifyCode")
+    @ResponseBody
+    public String verifyCode(@RequestParam("mobile")String mobile) throws JsonProcessingException {
+        DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", "<accessKeyId>", "<accessSecret>");
+        IAcsClient client = new DefaultAcsClient(profile);
+        CommonRequest request = new CommonRequest();
+        request.setMethod(MethodType.POST);
+        request.setDomain("dysmsapi.aliyuncs.com");
+        request.setVersion("2017-05-25");
+        request.setAction("SendSms");
+        try {
+            CommonResponse response = client.getCommonResponse(request);
+            System.out.println(response.getData());
+        } catch (ServerException e) {
+            e.printStackTrace();
+        } catch (ClientException e) {
+            e.printStackTrace();
+        }
 
+        return null;
 
+    }
 }
